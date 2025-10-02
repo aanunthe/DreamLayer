@@ -64,7 +64,7 @@ check_linux_version() {
 install_python() {
     # detect and choose pkg install command
     if command_exists apt-get; then
-        PKG_INSTALL="sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv"
+        PKG_INSTALL=" apt-get update && apt-get install -y python3 python3-pip python3-venv"
         USE_APT=true
     elif command_exists dnf; then
         PKG_INSTALL="sudo dnf install -y python3 python3-pip"
@@ -100,24 +100,24 @@ install_python() {
     if ! command_exists pip3; then
         if [ "${USE_APT:-false}" = true ]; then
             print_step "Installing pip3 via apt..."
-            sudo apt-get install -y python3-pip
+            apt-get install -y python3-pip
         else
             print_step "Bootstrapping pip via ensurepip..."
-            sudo python3 -m ensurepip --upgrade || true
+            python3 -m ensurepip --upgrade || true
         fi
     fi
 
     if [ "${USE_APT:-false}" = true ]; then
         print_step "Ensuring virtual environment support is installed..."
-        sudo apt-get update
+        apt-get update
 
         # Try generic package first
         if ! dpkg -s python3-venv >/dev/null 2>&1; then
             print_step "Installing python3-venv..."
-            sudo apt-get install -y python3-venv || {
+            apt-get install -y python3-venv || {
                 # Fallback: install version-specific package
                 PYVER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-                sudo apt-get install -y "python3.${PYVER}-venv"
+                apt-get install -y "python3.${PYVER}-venv"
             }
         fi
     fi
@@ -150,7 +150,7 @@ install_nodejs() {
 
     if command_exists apt-get; then
         curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-        sudo apt-get install -y nodejs npm
+        apt-get install -y nodejs npm
     elif command_exists dnf; then
         sudo dnf module enable -y nodejs:20 || true
         sudo dnf install -y nodejs npm
@@ -214,8 +214,8 @@ install_system_dependencies() {
             [freetype]=libfreetype6-dev # Font rendering
             [imagemagick]=imagemagick # Image processing
         )
-        INSTALL_CMD="sudo apt-get install -y"
-        sudo apt-get update  # run once outside the loop
+        INSTALL_CMD="apt-get install -y"
+        apt-get update  # run once outside the loop
     elif command_exists dnf; then
         PM="dnf"
         lib_map=(
